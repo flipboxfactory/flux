@@ -1,4 +1,4 @@
-# Flux: Manipulate complex data structures for Craft CMS
+# Manipulate data structures for Craft CMS
 [![Join the chat at https://gitter.im/flipboxfactory/flux](https://badges.gitter.im/flipboxfactory/flux.svg)](https://gitter.im/flipboxfactory/flux?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Latest Version](https://img.shields.io/github/release/flipboxfactory/flux.svg?style=flat-square)](https://github.com/flipboxfactory/flux/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
