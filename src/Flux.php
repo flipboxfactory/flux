@@ -71,7 +71,7 @@ class Flux extends Plugin
      * @return mixed
      */
     public function item(
-        $transformer = 'default',
+        $transformer,
         $data,
         string $scope = 'global',
         array $config = [],
@@ -102,7 +102,7 @@ class Flux extends Plugin
      * @return mixed
      */
     public function collection(
-        $transformer = 'default',
+        $transformer,
         $data,
         string $scope = 'global',
         array $config = [],
