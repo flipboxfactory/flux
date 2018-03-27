@@ -77,7 +77,7 @@ class Flux extends Plugin
         array $config = [],
         $default = null
     ) {
-        $transformer = $transformer = $this->getTransformers()->resolve($transformer, $scope);
+        $transformer = $this->getTransformers()->resolve($transformer, $scope);
         if ($transformer === null) {
             static::warning(sprintf(
                 "Unable to transform item because the transformer '%s' could not be resolved.",
