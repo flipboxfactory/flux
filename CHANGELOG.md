@@ -1,6 +1,6 @@
 Changelog
 =========
-## Unreleased
+## 1.0.0-rc.1 - 2018-03-27
 ### Changed
 - Icons
 
