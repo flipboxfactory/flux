@@ -11,7 +11,9 @@ namespace flipbox\flux\filters;
 use Craft;
 use flipbox\flux\Flux;
 use Flipbox\Transform\Transformers\TransformerInterface;
+use yii\base\Action;
 use yii\base\ActionFilter;
+use yii\base\Response;
 use yii\data\DataProviderInterface;
 
 /**
@@ -87,12 +89,54 @@ class TransformFilter extends ActionFilter
     public $scope = Flux::GLOBAL_SCOPE;
 
     /**
+     * @var callable a callback that will be called to determine if the transformer should be applied.
+     * The signature of the callback should be as follows:
+     *
+     * ```php
+     * function ($filter, $action, $data)
+     * ```
+     *
+     * where `$filter` is this transformer filter, `$action` is the current [[Action|action]] object, and `$data` is
+     * the data to be transformed.
+     * The callback should return a boolean value indicating whether this transformer should be applied.
+     */
+    public $matchCallback;
+
+    /**
+     * Checks whether this filter should transform the specified action data.
+     * @param Action $action the action to be performed
+     * @param mixed $data the data to be transformed
+     * @return bool `true` if the transformer should be applied, `false` if the transformer should be ignored
+     */
+    public function shouldTransform($action, $data): bool
+    {
+        if ($this->matchCustom($action, $data)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Action $action the action to be performed
+     * @param mixed $data the data to be transformed
+     * @return bool whether the transformer should be applied
+     */
+    protected function matchCustom($action, $data)
+    {
+        return empty($this->matchCallback) || call_user_func($this->matchCallback, $this, $action, $data);
+    }
+
+    /**
      * @param \yii\base\Action $action
      * @param mixed $result
      * @return array|mixed|null|DataProviderInterface
      */
     public function afterAction($action, $result)
     {
+        if (!$this->shouldTransform($action, $result)) {
+            return $result;
+        }
         return $this->transform($result);
     }
 
