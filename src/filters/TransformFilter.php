@@ -103,6 +103,13 @@ class TransformFilter extends ActionFilter
     public $matchCallback;
 
     /**
+     * Indicating whether to transform empty data
+     *
+     * @var bool
+     */
+    public $transformEmpty = false;
+
+    /**
      * Checks whether this filter should transform the specified action data.
      * @param Action $action the action to be performed
      * @param mixed $data the data to be transformed
@@ -110,11 +117,21 @@ class TransformFilter extends ActionFilter
      */
     public function shouldTransform($action, $data): bool
     {
-        if ($this->matchCustom($action, $data)) {
+        if ($this->matchData($data) &&
+            $this->matchCustom($action, $data)) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @param mixed $data the data to be transformed
+     * @return bool whether the transformer should be applied
+     */
+    protected function matchData($data)
+    {
+        return empty($data) && $this->transformEmpty !== true ? false : true;
     }
 
     /**
