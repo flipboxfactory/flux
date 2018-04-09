@@ -1,5 +1,13 @@
 Changelog
 =========
+## Unreleased
+### Added
+- `TransformHelper::eventName` to assist in assembling multi-part event names.
+- `RegisterTransformerEvent` for event based transformer management. 
+ 
+### Changed
+- A class is no longer required on the Transformer record.
+ 
 ## 1.0.0-rc.2 - 2018-03-27
 ### Added
 - `TransformFilter::$matchCallback` callable to handle custom logic in determining of a transformer should be applied.

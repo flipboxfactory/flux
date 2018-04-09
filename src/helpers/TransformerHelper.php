@@ -10,6 +10,7 @@ namespace flipbox\flux\helpers;
 
 use Craft;
 use craft\helpers\ArrayHelper;
+use craft\helpers\StringHelper;
 use flipbox\flux\Flux;
 use Flipbox\Transform\Helpers\TransformerHelper as BaseTransformerHelper;
 use Flipbox\Transform\Transformers\TransformerInterface;
@@ -21,6 +22,19 @@ use yii\base\InvalidConfigException;
  */
 class TransformerHelper extends BaseTransformerHelper
 {
+    /**
+     * @param $name
+     * @return string
+     */
+    public static function eventName($name)
+    {
+        if(!is_array($name)) {
+            $name = ArrayHelper::toArray($name);
+        }
+
+        return StringHelper::toString(array_filter($name), ':');
+    }
+
     /**
      * @param $transformer
      * @return bool

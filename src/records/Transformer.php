@@ -35,7 +35,6 @@ class Transformer extends ActiveRecordWithId
             [
                 [
                     [
-                        'class',
                         'scope'
                     ],
                     'required'
