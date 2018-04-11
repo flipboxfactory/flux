@@ -6,7 +6,7 @@
   "license": "MIT",
   "require": {
     "craftcms/cms": "~3.0.0-RC",
-    "flipboxdigital/transform": "~2.0"
+    "flipboxdigital/transform": "~2.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.0",

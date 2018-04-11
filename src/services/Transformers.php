@@ -96,19 +96,21 @@ class Transformers extends Component
      * @param $transformer
      * @param string $scope
      * @param string|null $class
+     * @param callable|TransformerInterface|null $default
      * @return callable|TransformerInterface|null
      */
     public function resolve(
         $transformer,
         string $scope = Flux::GLOBAL_SCOPE,
-        string $class = null
+        string $class = null,
+        $default = null
     ) {
         if (null !== ($callable = TransformerHelper::resolve($transformer))) {
             return $callable;
         }
 
         if (is_string($transformer)) {
-            return $this->find($transformer, $scope, $class);
+            return $this->find($transformer, $scope, $class, $default);
         }
 
         return null;
@@ -118,15 +120,17 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
+     * @param callable|TransformerInterface|null $default
      * @return callable|TransformerInterface
      * @throws ObjectNotFoundException
      */
     public function get(
         string $identifier,
         string $scope = Flux::GLOBAL_SCOPE,
-        string $class = null
+        string $class = null,
+        $default = null
     ) {
-        if (null === ($transformer = $this->find($identifier, $scope, $class))) {
+        if (null === ($transformer = $this->find($identifier, $scope, $class, $default))) {
             $this->notFoundException();
         }
 
@@ -137,12 +141,14 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
+     * @param callable|TransformerInterface|null $default
      * @return callable|TransformerInterface|null
      */
     public function find(
         string $identifier,
         string $scope = Flux::GLOBAL_SCOPE,
-        string $class = null
+        string $class = null,
+        $default = null
     ) {
         $identifierKey = is_numeric($identifier) ? 'id' : 'handle';
 
@@ -155,11 +161,13 @@ class Transformers extends Component
             $condition['class'] = $class;
         }
 
+        $transformer = $this->findByCondition($condition) ?: $default;
+
         return $this->triggerEvent(
             $identifier,
             $scope,
             $class,
-            $this->findByCondition($condition)
+            $transformer
         );
     }
 
@@ -187,6 +195,6 @@ class Transformers extends Component
             $event
         );
 
-        return $event->transformer;
+        return TransformerHelper::resolve($event->transformer);
     }
 }

@@ -24,15 +24,24 @@ class TransformerHelper extends BaseTransformerHelper
 {
     /**
      * @param $name
+     * @param bool $lowercase
      * @return string
      */
-    public static function eventName($name)
+    public static function eventName($name, $lowercase = true)
     {
         if(!is_array($name)) {
             $name = ArrayHelper::toArray($name);
         }
 
-        return StringHelper::toString(array_filter($name), ':');
+        // Clean
+        $name = array_filter($name);
+
+        // Lowercase
+        if($lowercase === true) {
+            $name = array_map('strtolower', $name);
+        }
+
+        return StringHelper::toString($name, ':');
     }
 
     /**
