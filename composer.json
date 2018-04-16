@@ -6,6 +6,7 @@
   "license": "MIT",
   "require": {
     "craftcms/cms": "~3.0.0-RC",
+    "flipboxfactory/craft-ember": "~1.0.0-rc.18",
     "flipboxdigital/transform": "~2.1"
   },
   "require-dev": {
