@@ -29,7 +29,7 @@ class TransformerHelper extends BaseTransformerHelper
      */
     public static function eventName($name, $lowercase = true)
     {
-        if(!is_array($name)) {
+        if (!is_array($name)) {
             $name = ArrayHelper::toArray($name);
         }
 
@@ -37,7 +37,7 @@ class TransformerHelper extends BaseTransformerHelper
         $name = array_filter($name);
 
         // Lowercase
-        if($lowercase === true) {
+        if ($lowercase === true) {
             $name = array_map('strtolower', $name);
         }
 

@@ -157,7 +157,7 @@ class Transformers extends Component
             'scope' => $scope
         ];
 
-        if($class !== null) {
+        if ($class !== null) {
             $condition['class'] = $class;
         }
 
@@ -180,7 +180,7 @@ class Transformers extends Component
      */
     private function triggerEvent(string $identifier, string $scope, string $class = null, $transformer = null)
     {
-        if($class === null) {
+        if ($class === null) {
             $class = get_class($this);
         }
 
