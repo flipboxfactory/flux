@@ -1,6 +1,6 @@
 Changelog
 =========
-## Unreleased
+## 1.0.0-rc.3 - 2018-04-16
 ### Added
 - `TransformHelper::eventName` to assist in assembling multi-part event names.
 - `RegisterTransformerEvent` for event based transformer management. 
