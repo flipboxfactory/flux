@@ -17,7 +17,6 @@ use flipbox\flux\db\TransformerQuery;
 use flipbox\flux\events\RegisterTransformerEvent;
 use flipbox\flux\Flux;
 use flipbox\flux\helpers\TransformerHelper;
-use Flipbox\Transform\Transformers\TransformerInterface;
 use yii\base\Component;
 use yii\base\Event;
 use yii\db\QueryInterface;
@@ -96,8 +95,8 @@ class Transformers extends Component
      * @param $transformer
      * @param string $scope
      * @param string|null $class
-     * @param callable|TransformerInterface|null $default
-     * @return callable|TransformerInterface|null
+     * @param callable|null $default
+     * @return callable|null
      */
     public function resolve(
         $transformer,
@@ -120,8 +119,8 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
-     * @param callable|TransformerInterface|null $default
-     * @return callable|TransformerInterface
+     * @param callable|null $default
+     * @return callable
      * @throws ObjectNotFoundException
      */
     public function get(
@@ -129,7 +128,7 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    ) {
+    ): callable {
         if (null === ($transformer = $this->find($identifier, $scope, $class, $default))) {
             $this->notFoundException();
         }
@@ -141,8 +140,8 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
-     * @param callable|TransformerInterface|null $default
-     * @return callable|TransformerInterface|null
+     * @param callable|null $default
+     * @return callable|null
      */
     public function find(
         string $identifier,
@@ -175,8 +174,8 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
-     * @param callable|TransformerInterface|null $transformer
-     * @return callable|TransformerInterface|null
+     * @param callable|null $transformer
+     * @return callable|null
      */
     private function triggerEvent(string $identifier, string $scope, string $class = null, $transformer = null)
     {

@@ -1,13 +1,13 @@
 {
   "name": "flipboxfactory/flux",
   "description": "Manipulate data structures",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "type": "craft-plugin",
   "license": "MIT",
   "require": {
-    "craftcms/cms": "~3.0.0-RC",
-    "flipboxfactory/craft-ember": "~1.0.0-rc.18",
-    "flipboxdigital/transform": "~2.2"
+    "craftcms/cms": "^3.0",
+    "flipboxfactory/craft-ember": "^1.0",
+    "flipboxdigital/transform": "^3.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.0",
@@ -31,9 +31,6 @@
     "class": "flipbox\\flux\\Flux",
     "schemaVersion": "1.0.1",
     "hasCpSettings": false,
-    "hasCpSection": false,
-    "components": {
-      "transformers": "flipbox\\flux\\services\\Transformers"
-    }
+    "hasCpSection": false
   }
 }

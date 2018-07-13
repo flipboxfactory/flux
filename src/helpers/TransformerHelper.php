@@ -13,7 +13,6 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\StringHelper;
 use flipbox\flux\Flux;
 use Flipbox\Transform\Helpers\TransformerHelper as BaseTransformerHelper;
-use Flipbox\Transform\Transformers\TransformerInterface;
 use yii\base\InvalidConfigException;
 
 /**
@@ -63,7 +62,7 @@ class TransformerHelper extends BaseTransformerHelper
 
     /**
      * @param $transformer
-     * @return null|callable|TransformerInterface
+     * @return null|callable
      */
     public static function resolve($transformer)
     {
