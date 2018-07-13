@@ -229,9 +229,9 @@ class TransformFilter extends ActionFilter
     protected function resolveTransformer($transformer)
     {
         if (null === ($callable = Flux::getInstance()->getTransformers()->resolve(
-                $transformer,
-                $this->scope
-            ))
+            $transformer,
+            $this->scope
+        ))
         ) {
             Flux::warning(sprintf(
                 "Unable to transform item because the transformer '%s' could not be resolved.",
