@@ -231,8 +231,7 @@ class TransformFilter extends ActionFilter
         if (null === ($callable = Flux::getInstance()->getTransformers()->resolve(
             $transformer,
             $this->scope
-        ))
-        ) {
+        ))) {
             Flux::warning(sprintf(
                 "Unable to transform item because the transformer '%s' could not be resolved.",
                 (string)Json::encode($transformer)
