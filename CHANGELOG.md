@@ -1,5 +1,12 @@
 Changelog
 =========
+## 1.0.0-rc.5 - 2018-07-13
+### Changed
+- Updated Transform library to v3.0
+
+### Removed
+- `Flux::item` and `Flux::collection` are not longer accessible.
+
 ## 1.0.0-rc.4 - 2018-05-11
 ### Changed
 - Updated dependencies
