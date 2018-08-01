@@ -24,6 +24,8 @@ class Install extends Migration
     {
         $this->createTables();
         $this->createIndexes();
+
+        return true;
     }
 
     /**

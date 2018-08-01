@@ -54,7 +54,7 @@ class TransformerHelper extends BaseTransformerHelper
             return false;
         }
 
-        if ($class = ArrayHelper::getValue($transformer, 'class')) {
+        if (null === ($class = ArrayHelper::getValue($transformer, 'class'))) {
             return false;
         }
 
