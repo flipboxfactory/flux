@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Unreleased
+## 1.0.0-rc.6 - 2018-08-01
 ### Fixed
 - Bug when attempting to resolve a transformer from a Yii config array
 
