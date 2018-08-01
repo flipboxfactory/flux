@@ -9,11 +9,11 @@
 namespace flipbox\flux\filters;
 
 use Craft;
+use craft\helpers\Json;
 use flipbox\flux\Flux;
-use Flipbox\Transform\Transformers\TransformerInterface;
+use Flipbox\Transform\Factory;
 use yii\base\Action;
 use yii\base\ActionFilter;
-use yii\base\Response;
 use yii\data\DataProviderInterface;
 
 /**
@@ -26,7 +26,7 @@ class TransformFilter extends ActionFilter
      * The default data transformer.  If a transformer cannot be resolved via an action mapping,
      * this transformer will be used.
      *
-     * @var string|callable|TransformerInterface
+     * @var string|callable
      */
     public $transformer;
 
@@ -178,15 +178,17 @@ class TransformFilter extends ActionFilter
     {
         if (Craft::$app->getRequest()->getIsHead()) {
             return null;
-        } else {
-            return Flux::getInstance()->item(
-                $this->transformer(),
-                $data,
-                $this->scope,
-                $this->getTransformConfig(),
+        }
+
+        if (null === ($transformer = $this->resolveTransformer($this->transformer()))) {
+            return $data;
+        };
+
+        return Factory::transform($this->getTransformConfig())
+            ->item(
+                $transformer,
                 $data
             );
-        }
     }
 
     /**
@@ -199,27 +201,49 @@ class TransformFilter extends ActionFilter
     {
         if (Craft::$app->getRequest()->getIsHead()) {
             return null;
-        } else {
-            $data = Flux::getInstance()->collection(
-                $this->transformer(),
-                $dataProvider->getModels(),
-                $this->scope,
-                $this->getTransformConfig(),
-                $dataProvider
+        }
+
+        if (null === ($transformer = $this->resolveTransformer($this->transformer()))) {
+            return $dataProvider;
+        };
+
+        $data = Factory::transform($this->getTransformConfig())
+            ->collection(
+                $transformer,
+                $dataProvider->getModels()
             );
 
-            if ($this->collectionEnvelope === null) {
-                return $data;
-            } else {
-                return [
-                    $this->collectionEnvelope => $data,
-                ];
-            }
+        if ($this->collectionEnvelope === null) {
+            return $data;
+        } else {
+            return [
+                $this->collectionEnvelope => $data,
+            ];
         }
     }
 
     /**
-     * @return callable|TransformerInterface|null
+     * @param $transformer
+     * @return callable|null
+     */
+    protected function resolveTransformer($transformer)
+    {
+        if (null === ($callable = Flux::getInstance()->getTransformers()->resolve(
+            $transformer,
+            $this->scope
+        ))) {
+            Flux::warning(sprintf(
+                "Unable to transform item because the transformer '%s' could not be resolved.",
+                (string)Json::encode($transformer)
+            ));
+            return null;
+        };
+
+        return $callable;
+    }
+
+    /**
+     * @return callable|null
      */
     protected function transformer()
     {

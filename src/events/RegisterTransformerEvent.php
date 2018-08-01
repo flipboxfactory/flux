@@ -8,7 +8,6 @@
 
 namespace flipbox\flux\events;
 
-use Flipbox\Transform\Transformers\TransformerInterface;
 use yii\base\Event;
 
 /**
@@ -30,7 +29,7 @@ class RegisterTransformerEvent extends Event
     /**
      * The transformer which will be used to alter data.  Keep in mind that multiple listeners may be registered on this
      * event and therefore can alter this value before/after.
-     * @var callable|TransformerInterface|null
+     * @var callable|null
      */
     public $transformer;
 }
