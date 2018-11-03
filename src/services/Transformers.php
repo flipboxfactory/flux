@@ -11,15 +11,13 @@ namespace flipbox\flux\services;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use flipbox\ember\exceptions\ObjectNotFoundException;
-use flipbox\ember\helpers\QueryHelper;
-use flipbox\ember\services\traits\objects\Accessor;
-use flipbox\flux\db\TransformerQuery;
-use flipbox\flux\events\RegisterTransformerEvent;
+use flipbox\flux\events\RegisterTransformersEvent;
 use flipbox\flux\Flux;
 use flipbox\flux\helpers\TransformerHelper;
+use flipbox\flux\records\Transformer;
 use yii\base\Component;
 use yii\base\Event;
-use yii\db\QueryInterface;
+use yii\db\Query;
 
 /**
  * @author Flipbox Factory <hello@flipboxfactory.com>
@@ -27,12 +25,28 @@ use yii\db\QueryInterface;
  */
 class Transformers extends Component
 {
-    use Accessor;
 
     /**
      * @event Event an event that is triggered when the query is initialized via [[init()]].
      */
     const EVENT_INIT = 'init';
+
+    /**
+     *
+     */
+    const EVENT_REGISTER_TRANSFORMERS = 'registerTransformer';
+
+    /**
+     * @var array
+     */
+    private $transformers;
+
+    /**
+     * The transformers that Event triggers have been executed
+     *
+     * @var array
+     */
+    private $processed = [];
 
     /**
      * Initializes the object.
@@ -46,50 +60,6 @@ class Transformers extends Component
         $this->trigger(self::EVENT_INIT);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function objectClass()
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getQuery($config = []): QueryInterface
-    {
-        $query = new TransformerQuery();
-
-        if (!empty($config)) {
-            QueryHelper::configure(
-                $query,
-                $config
-            );
-        }
-
-        return $query;
-    }
-
-    /**
-     * @param array $config
-     * @return array
-     */
-    protected function prepareConfig(array $config = []): array
-    {
-        if (null !== $settings = ArrayHelper::remove($config, 'config')) {
-            if (is_string($settings)) {
-                $settings = Json::decodeIfJson($settings);
-            }
-
-            $config = array_merge(
-                $config,
-                $settings
-            );
-        }
-
-        return $config;
-    }
 
     /**
      * @param $transformer
@@ -103,7 +73,8 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    ) {
+    )
+    {
         if (null !== ($callable = TransformerHelper::resolve($transformer))) {
             return $callable;
         }
@@ -128,7 +99,8 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    ): callable {
+    ): callable
+    {
         if (null === ($transformer = $this->find($identifier, $scope, $class, $default))) {
             $this->notFoundException();
         }
@@ -148,52 +120,122 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    ) {
-        $identifierKey = is_numeric($identifier) ? 'id' : 'handle';
-
-        $condition = [
-            $identifierKey => $identifier,
-            'scope' => $scope
-        ];
-
-        if ($class !== null) {
-            $condition['class'] = $class;
+    )
+    {
+        if (!Flux::getInstance()->isValidScope($scope)) {
+            return null;
         }
 
-        $transformer = $this->findByCondition($condition) ?: $default;
+        $transformersByScopeAndClass = $this->resolveAllByScopeAndClass($scope, $class);
 
-        return $this->triggerEvent(
-            $identifier,
-            $scope,
-            $class,
-            $transformer
-        );
+        if (null === ($transformer = $transformersByScopeAndClass[$identifier] ?? $default)) {
+            return null;
+        }
+
+        return TransformerHelper::resolve($transformer);
+    }
+
+
+    /**
+     * @param string $scope
+     * @param string|null $class
+     * @return array
+     */
+    public function resolveAllByScopeAndClass(
+        string $scope = Flux::GLOBAL_SCOPE,
+        string $class = null
+    ): array
+    {
+
+        // Default class
+        if ($class === null) {
+            $class = Flux::class;
+        }
+
+        if (($this->processed[$scope][$class] ?? false) !== true) {
+            $this->processed[$scope][$class] = true;
+
+            $this->ensureTransformerConfigs();
+
+            $event = new RegisterTransformersEvent([
+                'transformers' => $this->transformers[$scope][$class] ?? []
+            ]);
+
+            Event::trigger(
+                $class,
+                self::EVENT_REGISTER_TRANSFORMERS . ':' . $scope,
+                $event
+            );
+
+            $this->transformers[$scope][$class] = $event->transformers;
+        }
+
+        return $this->transformers[$scope][$class];
     }
 
     /**
-     * @param string $identifier
-     * @param string $scope
-     * @param string|null $class
-     * @param callable|null $transformer
-     * @return callable|null
+     * Ensure the db transformers are loaded
      */
-    private function triggerEvent(string $identifier, string $scope, string $class = null, $transformer = null)
+    protected function ensureTransformerConfigs()
     {
-        if ($class === null) {
-            $class = get_class($this);
+        if ($this->transformers === null) {
+            $this->transformers = $this->dbTransformers();
+        }
+    }
+
+    /**
+     * @return array
+     */
+    protected function dbTransformers(): array
+    {
+        $query = (new Query())
+            ->select(['handle', 'scope', 'class', 'config'])
+            ->from([Transformer::tableName()]);
+
+        $configs = [];
+
+        foreach ($query->all() as $result) {
+            $configs[$result['scope']][$result['class']][$result['handle']] = $this->prepareConfig([$result['config']]);
         }
 
-        $event = new RegisterTransformerEvent([
-            'scope' => $scope,
-            'transformer' => $transformer
-        ]);
-
-        Event::trigger(
-            $class,
-            $identifier,
-            $event
-        );
-
-        return TransformerHelper::resolve($event->transformer);
+        return $configs;
     }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    protected function prepareConfig(array $config = []): array
+    {
+        if (null !== ($settings = ArrayHelper::remove($config, 'config'))) {
+            if (is_string($settings)) {
+                $settings = Json::decodeIfJson($settings);
+            }
+
+            $config = array_merge(
+                $config,
+                $settings
+            );
+        }
+
+        return $config;
+    }
+
+
+    /*******************************************
+     * EXCEPTIONS
+     *******************************************/
+
+    /**
+     * @throws ObjectNotFoundException
+     */
+    protected function notFoundException()
+    {
+        throw new ObjectNotFoundException(
+            sprintf(
+                "Transformer not found."
+            )
+        );
+    }
+
 }
