@@ -8,7 +8,8 @@
 
 namespace flipbox\flux\cp;
 
-use modules\Module;
+
+use yii\base\Module;
 
 /**
  * @author Flipbox Factory <hello@flipboxfactory.com>

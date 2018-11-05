@@ -31,6 +31,6 @@
     "class": "flipbox\\flux\\Flux",
     "schemaVersion": "1.0.1",
     "hasCpSettings": false,
-    "hasCpSection": false
+    "hasCpSection": true
   }
 }

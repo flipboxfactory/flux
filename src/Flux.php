@@ -9,7 +9,9 @@
 namespace flipbox\flux;
 
 use craft\base\Plugin;
+use craft\events\RegisterUrlRulesEvent;
 use craft\web\twig\variables\CraftVariable;
+use craft\web\UrlManager;
 use flipbox\ember\modules\LoggerTrait;
 use flipbox\flux\events\RegisterScopesEvent;
 use yii\base\Event;
@@ -67,6 +69,13 @@ class Flux extends Plugin
                 $variable->set('flux', static::getInstance());
             }
         );
+
+        // CP routes
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            [self::class, 'onRegisterCpUrlRules']
+        );
     }
 
     /**
@@ -110,6 +119,23 @@ class Flux extends Plugin
         return in_array($scope, $this->getScopes(), true);
     }
 
+    /*******************************************
+     * EVENTS
+     *******************************************/
+
+    /**
+     * @param RegisterUrlRulesEvent $event
+     */
+    public static function onRegisterCpUrlRules(RegisterUrlRulesEvent $event)
+    {
+        $event->rules = array_merge(
+            $event->rules,
+            [
+                // FLUX
+                'flux' => 'flux/cp/view/flux/index',
+            ]
+        );
+    }
 
     /*******************************************
      * SERVICES
