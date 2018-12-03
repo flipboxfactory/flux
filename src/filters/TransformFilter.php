@@ -11,7 +11,7 @@ namespace flipbox\flux\filters;
 use Craft;
 use craft\helpers\Json;
 use flipbox\flux\Flux;
-use Flipbox\Transform\Factory;
+use flipbox\transform\Factory;
 use yii\base\Action;
 use yii\base\ActionFilter;
 use yii\data\DataProviderInterface;

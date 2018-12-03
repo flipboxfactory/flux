@@ -12,7 +12,7 @@ use Craft;
 use craft\helpers\ArrayHelper;
 use craft\helpers\StringHelper;
 use flipbox\flux\Flux;
-use Flipbox\Transform\Helpers\TransformerHelper as BaseTransformerHelper;
+use flipbox\transform\helpers\TransformerHelper as BaseTransformerHelper;
 use yii\base\InvalidConfigException;
 
 /**

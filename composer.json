@@ -1,7 +1,7 @@
 {
   "name": "flipboxfactory/flux",
   "description": "Manipulate data structures",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "type": "craft-plugin",
   "license": "MIT",
   "require": {

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## 1.0.0-rc.7 - 2018-12-03
+### Changed
+- Upgraded Transform package that uses lowercase namespaces
+
 ## 1.0.0-rc.6 - 2018-08-01
 ### Fixed
 - Bug when attempting to resolve a transformer from a Yii config array
