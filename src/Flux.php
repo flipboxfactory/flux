@@ -10,6 +10,7 @@ namespace flipbox\flux;
 
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
+use flipbox\flux\events\RegisterScopesEvent;
 use flipbox\craft\ember\modules\LoggerTrait;
 use yii\base\Event;
 
@@ -26,7 +27,17 @@ class Flux extends Plugin
     /**
      * The global scope
      */
+    const EVENT_REGISTER_SCOPES = 'registerScopes';
+
+    /**
+     * The global scope
+     */
     const GLOBAL_SCOPE = 'global';
+
+    /**
+     * @var array
+     */
+    private $scopes;
 
     /**
      * @inheritdoc
@@ -59,6 +70,40 @@ class Flux extends Plugin
     {
         return 'flux';
     }
+
+    /**
+     * Register scopes
+     * @return array
+     */
+    public function getScopes(): array
+    {
+        if ($this->scopes === null) {
+            $event = new RegisterScopesEvent([
+                'scopes' => [
+                    self::GLOBAL_SCOPE
+                ]
+            ]);
+
+            $this->trigger(
+                self::EVENT_REGISTER_SCOPES,
+                $event
+            );
+
+            $this->scopes = $event->scopes;
+        }
+
+        return $this->scopes;
+    }
+
+    /**
+     * @param string $scope
+     * @return bool
+     */
+    public function isValidScope(string $scope): bool
+    {
+        return in_array($scope, $this->getScopes(), true);
+    }
+
 
     /*******************************************
      * SERVICES

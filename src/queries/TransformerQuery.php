@@ -6,7 +6,7 @@
  * @link       https://www.flipboxfactory.com/software/flux/
  */
 
-namespace flipbox\flux\db;
+namespace flipbox\flux\queries;
 
 use craft\db\Query;
 use craft\helpers\Db;
