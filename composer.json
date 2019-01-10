@@ -1,12 +1,12 @@
 {
   "name": "flipboxfactory/flux",
   "description": "Manipulate data structures",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "type": "craft-plugin",
   "license": "MIT",
   "require": {
     "craftcms/cms": "^3.0",
-    "flipboxfactory/craft-ember": "^1.0",
+    "flipboxfactory/craft-ember": "^2.0",
     "flipboxdigital/transform": "^3.0"
   },
   "require-dev": {

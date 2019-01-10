@@ -10,8 +10,8 @@ namespace flipbox\flux\services;
 
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
-use flipbox\ember\exceptions\ObjectNotFoundException;
 use flipbox\flux\events\RegisterTransformersEvent;
+use flipbox\flux\exceptions\TransformerNotFoundException;
 use flipbox\flux\Flux;
 use flipbox\flux\helpers\TransformerHelper;
 use flipbox\flux\records\Transformer;
@@ -25,20 +25,22 @@ use yii\db\Query;
  */
 class Transformers extends Component
 {
-
     /**
-     * @event Event an event that is triggered when the query is initialized via [[init()]].
+     * @event Event an event that is triggered when the class is initialized via [[init()]].
      */
     const EVENT_INIT = 'init';
 
     /**
-     *
+     * @event Event an event that is triggered when the transformers are registered.
      */
     const EVENT_REGISTER_TRANSFORMERS = 'registerTransformer';
 
     /**
+     * Transformers that have previously been loaded
+     *
      * @var array
      */
+
     private $transformers;
 
     /**
@@ -60,7 +62,6 @@ class Transformers extends Component
         $this->trigger(self::EVENT_INIT);
     }
 
-
     /**
      * @param $transformer
      * @param string $scope
@@ -73,8 +74,7 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    )
-    {
+    ) {
         if (null !== ($callable = TransformerHelper::resolve($transformer))) {
             return $callable;
         }
@@ -90,19 +90,25 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
-     * @param callable|null $default
+     * @param null $default
      * @return callable
-     * @throws ObjectNotFoundException
+     * @throws TransformerNotFoundException
      */
     public function get(
         string $identifier,
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    ): callable
-    {
+    ): callable {
         if (null === ($transformer = $this->find($identifier, $scope, $class, $default))) {
-            $this->notFoundException();
+            throw new TransformerNotFoundException(sprintf(
+                "Unable to find transformer with the following criteria: %s",
+                Json::encode([
+                    'identifier' => $identifier,
+                    'scope' => $scope,
+                    'class' => $class
+                ])
+            ));
         }
 
         return $transformer;
@@ -120,8 +126,7 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null,
         $default = null
-    )
-    {
+    ) {
         if (!Flux::getInstance()->isValidScope($scope)) {
             return null;
         }
@@ -144,9 +149,7 @@ class Transformers extends Component
     public function resolveAllByScopeAndClass(
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null
-    ): array
-    {
-
+    ): array {
         // Default class
         if ($class === null) {
             $class = Flux::class;
@@ -220,22 +223,4 @@ class Transformers extends Component
 
         return $config;
     }
-
-
-    /*******************************************
-     * EXCEPTIONS
-     *******************************************/
-
-    /**
-     * @throws ObjectNotFoundException
-     */
-    protected function notFoundException()
-    {
-        throw new ObjectNotFoundException(
-            sprintf(
-                "Transformer not found."
-            )
-        );
-    }
-
 }

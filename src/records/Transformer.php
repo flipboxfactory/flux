@@ -8,7 +8,7 @@
 
 namespace flipbox\flux\records;
 
-use flipbox\ember\records\ActiveRecordWithId;
+use flipbox\craft\ember\records\ActiveRecordWithId;
 
 /**
  * @author Flipbox Factory <hello@flipboxfactory.com>
