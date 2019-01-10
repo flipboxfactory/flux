@@ -23,10 +23,9 @@ class TransformerHelper extends BaseTransformerHelper
 {
     /**
      * @param $name
-     * @param bool $lowercase
      * @return string
      */
-    public static function eventName($name, $lowercase = true)
+    public static function assembleIdentifier($name)
     {
         if (!is_array($name)) {
             $name = ArrayHelper::toArray($name);
@@ -35,12 +34,9 @@ class TransformerHelper extends BaseTransformerHelper
         // Clean
         $name = array_filter($name);
 
-        // Lowercase
-        if ($lowercase === true) {
-            $name = array_map('strtolower', $name);
-        }
-
-        return StringHelper::toString($name, ':');
+        return StringHelper::toLowerCase(
+            StringHelper::toString($name, ':')
+        );
     }
 
     /**

@@ -31,11 +31,6 @@ class Transformers extends Component
     const EVENT_INIT = 'init';
 
     /**
-     * @event Event an event that is triggered when the transformers are registered.
-     */
-    const EVENT_REGISTER_TRANSFORMERS = 'registerTransformer';
-
-    /**
      * Transformers that have previously been loaded
      *
      * @var array
@@ -149,10 +144,9 @@ class Transformers extends Component
         string $scope = Flux::GLOBAL_SCOPE,
         string $class = null
     ): array {
+
         // Default class
-        if ($class === null) {
-            $class = Flux::class;
-        }
+        $class = $class ?: Flux::class;
 
         if (($this->processed[$scope][$class] ?? false) !== true) {
             $this->processed[$scope][$class] = true;
@@ -165,7 +159,7 @@ class Transformers extends Component
 
             Event::trigger(
                 $class,
-                self::EVENT_REGISTER_TRANSFORMERS . ':' . $scope,
+                $event::eventName($scope),
                 $event
             );
 
