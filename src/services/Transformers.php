@@ -8,13 +8,11 @@
 
 namespace flipbox\flux\services;
 
-use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
-use flipbox\ember\exceptions\ObjectNotFoundException;
-use flipbox\ember\helpers\QueryHelper;
-use flipbox\ember\services\traits\objects\Accessor;
+use flipbox\craft\ember\helpers\QueryHelper;
 use flipbox\flux\db\TransformerQuery;
 use flipbox\flux\events\RegisterTransformerEvent;
+use flipbox\flux\exceptions\TransformerNotFoundException;
 use flipbox\flux\Flux;
 use flipbox\flux\helpers\TransformerHelper;
 use yii\base\Component;
@@ -27,8 +25,6 @@ use yii\db\QueryInterface;
  */
 class Transformers extends Component
 {
-    use Accessor;
-
     /**
      * @event Event an event that is triggered when the query is initialized via [[init()]].
      */
@@ -49,14 +45,6 @@ class Transformers extends Component
     /**
      * @inheritdoc
      */
-    public static function objectClass()
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getQuery($config = []): QueryInterface
     {
         $query = new TransformerQuery();
@@ -69,26 +57,6 @@ class Transformers extends Component
         }
 
         return $query;
-    }
-
-    /**
-     * @param array $config
-     * @return array
-     */
-    protected function prepareConfig(array $config = []): array
-    {
-        if (null !== $settings = ArrayHelper::remove($config, 'config')) {
-            if (is_string($settings)) {
-                $settings = Json::decodeIfJson($settings);
-            }
-
-            $config = array_merge(
-                $config,
-                $settings
-            );
-        }
-
-        return $config;
     }
 
     /**
@@ -119,9 +87,9 @@ class Transformers extends Component
      * @param string $identifier
      * @param string $scope
      * @param string|null $class
-     * @param callable|null $default
+     * @param null $default
      * @return callable
-     * @throws ObjectNotFoundException
+     * @throws TransformerNotFoundException
      */
     public function get(
         string $identifier,
@@ -130,7 +98,14 @@ class Transformers extends Component
         $default = null
     ): callable {
         if (null === ($transformer = $this->find($identifier, $scope, $class, $default))) {
-            $this->notFoundException();
+            throw new TransformerNotFoundException(sprintf(
+                "Unable to find transformer with the following criteria: %s",
+                Json::encode([
+                    'identifier' => $identifier,
+                    'scope' => $scope,
+                    'class' => $class
+                ])
+            ));
         }
 
         return $transformer;
@@ -160,7 +135,9 @@ class Transformers extends Component
             $condition['class'] = $class;
         }
 
-        $transformer = $this->findByCondition($condition) ?: $default;
+        if (null === ($transformer = $this->getQuery($condition))) {
+            $transformer = $default;
+        }
 
         return $this->triggerEvent(
             $identifier,

@@ -10,7 +10,7 @@ namespace flipbox\flux;
 
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
-use flipbox\ember\modules\LoggerTrait;
+use flipbox\craft\ember\modules\LoggerTrait;
 use yii\base\Event;
 
 /**

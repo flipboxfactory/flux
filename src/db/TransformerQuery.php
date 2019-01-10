@@ -9,9 +9,9 @@
 namespace flipbox\flux\db;
 
 use craft\db\Query;
-use craft\db\QueryAbortedException;
 use craft\helpers\Db;
-use flipbox\ember\db\traits\AuditAttributes;
+use flipbox\craft\ember\queries\AuditAttributesTrait;
+use flipbox\flux\Flux;
 
 /**
  * @author Flipbox Factory <hello@flipboxfactory.com>
@@ -19,7 +19,7 @@ use flipbox\ember\db\traits\AuditAttributes;
  */
 class TransformerQuery extends Query
 {
-    use AuditAttributes;
+    use AuditAttributesTrait;
 
     /**
      * @var int|int[]|null
@@ -39,39 +39,29 @@ class TransformerQuery extends Query
     /**
      * @var string|string[]|null
      */
-    public $scope;
+    public $scope = Flux::GLOBAL_SCOPE;
 
     /**
      * @inheritdoc
-     *
-     * @throws QueryAbortedException if it can be determined that there won’t be any results
      */
     public function prepare($builder)
     {
         $this->applyAuditAttributeConditions();
-        $this->applyAttributeConditions();
+        $this->applyConditions();
         return parent::prepare($builder);
     }
 
     /**
-     *
+     * Apply attribute conditions
      */
-    protected function applyAttributeConditions()
+    protected function applyConditions()
     {
-        if ($this->id !== null) {
-            $this->andWhere(Db::parseParam('id', $this->id));
-        }
+        $attributes = ['id', 'handle', 'class', 'scope'];
 
-        if ($this->handle !== null) {
-            $this->andWhere(Db::parseParam('handle', $this->handle));
-        }
-
-        if ($this->class !== null) {
-            $this->andWhere(Db::parseParam('class', $this->class));
-        }
-
-        if ($this->scope !== null) {
-            $this->andWhere(Db::parseParam('scope', $this->scope));
+        foreach ($attributes as $attribute) {
+            if (null !== ($value = $this->{$attribute})) {
+                $this->andWhere(Db::parseParam($attribute, $value));
+            }
         }
     }
 }
