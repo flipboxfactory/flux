@@ -26,9 +26,11 @@
   "extra": {
     "name": "Flux",
     "handle": "flux",
+    "class": "flipbox\\flux\\Flux",
     "developer": "Flipbox Digital",
     "developerUrl": "https://www.flipboxdigital.com",
-    "class": "flipbox\\flux\\Flux",
+    "changelogUrl": "https://raw.githubusercontent.com/flipboxfactory/flux/master/CHANGELOG.md",
+    "documentationUrl": "https://flux.flipboxfactory.com",
     "schemaVersion": "1.0.1",
     "hasCpSettings": false,
     "hasCpSection": true
