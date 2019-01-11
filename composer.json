@@ -33,6 +33,6 @@
     "documentationUrl": "https://flux.flipboxfactory.com",
     "schemaVersion": "1.0.1",
     "hasCpSettings": false,
-    "hasCpSection": true
+    "hasCpSection": false
   }
 }
